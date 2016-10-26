@@ -1,0 +1,30 @@
+These clients are compiled and you can use them to test how tftp works.
+They come compiled for four different architectures found on the schhols unix and Linux systems.
+
+tftp_xxx_linux - For use on the computer in the lab rooms or via the ThinLinc client
+tftp_xxx_linuxserver - For use with the Linux servers (e.g., tussilago, vitsippa)
+tftp_xxx_solaris_sparc - For use with the login unix servers (e.g., hamberg, pilspetsen) running
+                         Solaris with a Sparc hardware architecture.
+tftp_xxx_solaris_x86:64 - For use with the login unix servers (e.g., beurling, celcius) running
+                          Solaris with a x86 64-bit hardware architecture.
+
+
+For the latter two, you can find out your architecture type by typing the following in the terminal:
+
+uname -a
+
+then you will see something like this,
+
+SunOS hamberg.it.uu.se 5.10 Generic_148888-04 sun4u sparc SUNW,Ultra-80
+
+indicating that you are running on SPARC for example.
+
+You can also look at the information on the webpages:
+http://www.it.uu.se/datordrift/maskinpark/
+
+
+To run the program type
+
+./tftp_6969_sparc -g medium.pdf rabbit.it.uu.se
+
+The number 6969 or any other number indicates which port on the server that the client will be using.
