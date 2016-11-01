@@ -71,8 +71,9 @@ def parse_packet(msg):
 		sizeOfData = len(msg[4:])
 		blocknr = struct.unpack("!H", msg[2:4])[0]
 		data = struct.unpack("!"+str(sizeOfData)+"s", msg[4:])[0]
+		print data
 		if blocknr != None and data != None:
-			return opcode, blocknr, data		
+			return opcode, blocknr, data
 		return None
 
 	elif opcode == OPCODE_ACK:
