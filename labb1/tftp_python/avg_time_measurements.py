@@ -21,6 +21,6 @@ while current_run < number_of_runs:
 	downloaded_file = subprocess.call('python tftp.py -g ' + str(file_to_dl) + " rabbit.it.uu.se", shell=True)
 	current_run = current_run+1
 
-total_time = ((time.time() - start_time)/number_of_runs)
+total_time = ((time.time() - start_time)/current_run)
 
 print "Avg time:"+ str(total_time) + " seconds --------  Number of samples:" + str(current_run) 
