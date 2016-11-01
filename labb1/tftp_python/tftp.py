@@ -71,7 +71,6 @@ def parse_packet(msg):
 	elif opcode == OPCODE_DATA:
 		sizeOfData = len(msg[4:])
 		blocknr = struct.unpack("!H", msg[2:4])[0]
-		print len(msg[4:])
 		data = struct.unpack("!"+str(sizeOfData)+"s", msg[4:])	
 		if blocknr != None and data != None:
 			return opcode, blocknr, data		
@@ -109,24 +108,28 @@ def tftp_transfer(fd, hostname, direction):
     # Put or get the file, block by block, in a loop.
 
 	rcv_total = 0
-
+	
 	while True:
 		(rl,wl,xl) = select.select([cs], [], [], TFTP_TIMEOUT)
 
 		if direction == TFTP_GET:
 			
 			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)
-		
+			
 			opcode, blocknr, data = parse_packet(rcv_buffer)
 			fd.write(data[0])
 			ack_packet = make_packet_ack(blocknr)
 			cs.sendto(ack_packet, addr)	
-			print len(rcv_buffer)
-			print sys.getsizeof(rcv_buffer)
+			rcv_total += len(rcv_buffer)
+			
 			if len(rcv_buffer) < BLOCK_SIZE:
+				print "Received: " + str(rcv_total) + " Bytes"
 				break
 
-    		rcv_total += len(rcv_buffer)
+
+		if direction == TFTP_PUT:
+    		
+			
 		
 						
         # Wait for packet, write the data to the filedescriptor or
