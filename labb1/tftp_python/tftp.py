@@ -95,12 +95,36 @@ def tftp_transfer(fd, hostname, direction):
     
     # Open socket interface
     cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	(family, socktype, proto, canonname, sockaddr) = getaddrinfo(hostname)
+	(family, socktype, proto, canonname, sockaddr) = getaddrinfo(hostname)[1]
+	address = (TFTP_PORT, sockaddr)
+
+	if direction == TFTP_GET:
+		request = make_packet_rrq(fd.name, MODE_OCTET)
+	else:
+		request = make_packet_wrq(fd.name, MODE_OCTET)
     # Check if we are putting a file or getting a file and send
     #  the corresponding request.
-    
+    cs.sendto(request, address)
     # Put or get the file, block by block, in a loop.
+
+	(rcv_buffer, (host, port)) = cs.recvfrom(BLOCK_SIZE)     
+    rcv_total, retry_count = len(rcv_buffer), 0
+
+
     while True:
+		(rl,wl,xl) = select.select(cs, [], [], TFTP_TIMEOUT)
+
+		if direction == TFTP_GET:		
+			opcode, blocknr, data = parse_packet(recv_buffer)
+			fd.write(data)
+			ack_packet = make_packet_ack(blocknr)
+			cs.sendto(ack_packet,address)	
+			if len(rcv_buffer) > BLOCK_SIZE:
+				break
+			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)     
+    		rcv_total, retry_count = len(rcv_buffer), 0
+		
+						
         # Wait for packet, write the data to the filedescriptor or
         # read the next block from the file. Send new packet to server.
         # Don't forget to deal with timeouts and received error packets.
