@@ -41,7 +41,6 @@ def make_packet_wrq(filename, mode):
     return struct.pack("!H", OPCODE_WRQ) + filename + '\0' + mode + '\0'
 
 def make_packet_data(blocknr, data):
-	sizeOfData = len(data)
 	return struct.pack("!HH", OPCODE_DATA, blocknr) + data
 
 def make_packet_ack(blocknr):
@@ -131,13 +130,12 @@ def tftp_transfer(fd, hostname, direction):
 			packet = parse_packet(rcv_buffer)
 
 			if packet[0] == OPCODE_ACK:
-				blocknr = packet[1]
-				blocknr = blocknr+1
-				data_packet = make_packet_data(blocknr,fd.read(BLOCK_SIZE))
+				blocknr = packet[1]+1
+				data = fd.read(BLOCK_SIZE)
+				data_packet = make_packet_data(blocknr,data)
 				cs.sendto(data_packet,addr)
-				
-				dataSize = len(parse_packet(data_packet)[2][0])
-				if dataSize < BLOCK_SIZE:
+				#dataSize = len(parse_packet(data_packet)[2][0])
+				if len(data) < BLOCK_SIZE:
 					print "Finished Uploading!"
 					break
 			if packet[0] == OPCODE_ERR:
