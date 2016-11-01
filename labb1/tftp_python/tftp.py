@@ -129,7 +129,9 @@ def tftp_transfer(fd, hostname, direction):
 		if direction == TFTP_PUT:
 			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)		
 			packet = parse_packet(rcv_buffer)
-			
+			print "HEJ?"
+			print packet[0]
+			print packet[1]
 
 			if packet[0] == OPCODE_ACK:
 				blocknr = packet[1]
