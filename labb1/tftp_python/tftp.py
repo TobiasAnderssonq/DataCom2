@@ -86,7 +86,7 @@ def parse_packet(msg):
 	elif opcode == OPCODE_ERR:
 		errcode = struct.unpack("!H", msg[2:4])[0]
 		errmsg = msg[4:].split('\0')
-		if errcode != None and errormsg != None:
+		if errcode != None and errmsg != None:
 			return opcode, errcode, errmsg
 		return None	
 
@@ -114,15 +114,16 @@ def tftp_transfer(fd, hostname, direction):
 		(rl,wl,xl) = select.select([cs], [], [], TFTP_TIMEOUT)
 
 		if direction == TFTP_GET:
-			print("tu madre")
+			
 			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)
-			print("Axels madre")
+		
 			opcode, blocknr, data = parse_packet(rcv_buffer)
 			fd.write(data[0])
 			ack_packet = make_packet_ack(blocknr)
 			cs.sendto(ack_packet, addr)	
-
-			if len(rcv_buffer) > BLOCK_SIZE:
+			print len(rcv_buffer)
+			print sys.getsizeof(rcv_buffer)
+			if len(rcv_buffer) < BLOCK_SIZE:
 				break
 
     		rcv_total += len(rcv_buffer)
