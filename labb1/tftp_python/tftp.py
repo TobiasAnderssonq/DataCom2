@@ -69,7 +69,7 @@ def parse_packet(msg):
 		return opcode, l[0], l[1] #PREVIOUSLY 1 AND 2
 
 	elif opcode == OPCODE_DATA:
-		sizeOfData = sys.getsizeof(msg[4:])
+		sizeOfData = len(msg[4:])
 		blocknr = struct.unpack("!H", msg[2:4])[0]
 		print len(msg[4:])
 		data = struct.unpack("!"+str(sizeOfData)+"s", msg[4:])	
@@ -118,6 +118,7 @@ def tftp_transfer(fd, hostname, direction):
 			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)
 			print("Axels madre")
 			opcode, blocknr, data = parse_packet(rcv_buffer)
+			print data
 			fd.write(data)
 			ack_packet = make_packet_ack(blocknr)
 			cs.sendto(ack_packet, addr)	
