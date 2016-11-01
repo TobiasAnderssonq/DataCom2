@@ -41,8 +41,8 @@ def make_packet_wrq(filename, mode):
     return struct.pack("!H", OPCODE_WRQ) + filename + '\0' + mode + '\0'
 
 def make_packet_data(blocknr, data):
-	numberOfH = (sys.getsizeof(data)/2)
-	return struct.pack("!"+str(numberOfH+2)+"H", OPCODE_DATA, blocknr, data)
+	sizeOfData = len(data)
+	return struct.pack("!"+str(sizeOfData)+"s", OPCODE_DATA, blocknr, data)
 
 def make_packet_ack(blocknr):
     return struct.pack("!HH", OPCODE_ACK,blocknr)
@@ -127,12 +127,10 @@ def tftp_transfer(fd, hostname, direction):
 
 
 		if direction == TFTP_PUT:
-			print "hej?"
-			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)
-			print "HALLOJ!"			
+			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)		
 			packet = parse_packet(rcv_buffer)
-			print packet[0]
-			print packet[1]
+			
+
 			if packet[0] == OPCODE_ACK:
 				blocknr = packet[1]
 				blocknr = blocknr+1
