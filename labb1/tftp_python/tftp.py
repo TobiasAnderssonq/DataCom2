@@ -131,7 +131,7 @@ def tftp_transfer(fd, hostname, direction):
 
 			if packet[0] == OPCODE_ACK:
 				blocknr = packet[1]+1
-				data = fd.read(BLOCK_SIZE)
+				data = fd.read(BLOCK_SIZE-4)
 				data_packet = make_packet_data(blocknr,data)
 				cs.sendto(data_packet,addr)
 				#dataSize = len(parse_packet(data_packet)[2][0])
