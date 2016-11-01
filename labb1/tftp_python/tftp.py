@@ -129,15 +129,17 @@ def tftp_transfer(fd, hostname, direction):
 		if direction == TFTP_PUT:
 			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)		
 			packet = parse_packet(rcv_buffer)
-			print "HEJ?"
-			print packet[0]
-			print packet[1]
 
 			if packet[0] == OPCODE_ACK:
 				blocknr = packet[1]
 				blocknr = blocknr+1
 				data_packet = make_packet_data(blocknr,fd.read(BLOCK_SIZE))
 				cs.sendto(data_packet,addr)
+
+				dataSize = len(parse_packet(data_packet)[2])
+				if dataSize < BLOCK_SIZE:
+					print "Finished Uploading!"
+					break
 			if packet[0] == OPCODE_ERR:
 				print packet[2]
 			
