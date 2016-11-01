@@ -137,6 +137,7 @@ def tftp_transfer(fd, hostname, direction):
 				cs.sendto(data_packet,addr)
 
 				dataSize = len(parse_packet(data_packet)[2])
+				print dataSize
 				if dataSize < BLOCK_SIZE:
 					print "Finished Uploading!"
 					break
