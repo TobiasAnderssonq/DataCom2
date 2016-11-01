@@ -41,8 +41,8 @@ def make_packet_wrq(filename, mode):
     return struct.pack("!H", OPCODE_WRQ) + filename + '\0' + mode + '\0'
 
 def make_packet_data(blocknr, data):
-	numberOfH = sys.getsizeof(data)/2
-    return struct.pack("!"+str(numberOfH+2)+"H", OPCODE_DATA, blocknr, data)
+	numberOfH = (sys.getsizeof(data)/2)
+	return struct.pack("!"+str(numberOfH+2)+"H", OPCODE_DATA, blocknr, data)
 
 def make_packet_ack(blocknr):
     return struct.pack("!HH", OPCODE_ACK,blocknr)
@@ -51,34 +51,35 @@ def make_packet_err(errcode, errmsg):
     return struct.pack("!HH", OPCODE_ERR, errcode) + errmsg + '\0'
 
 def parse_packet(msg):
-    """This function parses a recieved packet and returns a tuple where the
-        first value is the opcode as an integer and the following values are
-        the other parameters of the packets in python data types"""
-    opcode = struct.unpack("!H", msg[:2])[0]
-    if opcode == OPCODE_RRQ:
-        l = msg[2:].split('\0')
-        if len(l) != 3:
-            return None
-        return opcode, l[0], l[1] #PREVIOUSLY 1 AND 2
+    #"""This function parses a recieved packet and returns a tuple where the
+    #   first value is the opcode as an integer and the following values are
+    #    the other parameters of the packets in python data types"""
+	opcode = struct.unpack("!H", msg[:2])[0]
+	
+	if opcode == OPCODE_RRQ:
+		l = msg[2:].split('\0')
+		if len(l) != 3:
+			return None
+		return opcode, l[0], l[1] #PREVIOUSLY 1 AND 2
 
-    elif opcode == OPCODE_WRQ:
-        l = msg[2:].split('\0')
-        if len(l) != 3:
-            return None
-        return opcode, l[0], l[1] #PREVIOUSLY 1 AND 2
+	elif opcode == OPCODE_WRQ:
+		l = msg[2:].split('\0')
+		if len(l) != 3:
+			return None
+		return opcode, l[0], l[1] #PREVIOUSLY 1 AND 2
 
 	elif opcode == OPCODE_DATA:
 		sizeOfData = sys.getsizeof(msg[4:])/2
 		blocknr = struct.unpack("!H", msg[2:4])[0]
 		data = struct.unpack("!"+str(sizeofData)+"H", msg[4:])	
-		if blocknr != None and data != None    	
+		if blocknr != None and data != None:
 			return opcode, blocknr, data		
 		return None
 
 	elif opcode == OPCODE_ACK:
 		blocknr = struct.unpack("!H", msg[2:4])[0]
-			if blocknr != None:
-				return opcode, blocknr				
+		if blocknr != None:
+			return opcode, blocknr				
 		return None
 	
 	elif opcode == OPCODE_ERR:
@@ -94,35 +95,36 @@ def tftp_transfer(fd, hostname, direction):
     # Implement this function
     
     # Open socket interface
-    cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	(family, socktype, proto, canonname, sockaddr) = getaddrinfo(hostname)[1]
-	address = (TFTP_PORT, sockaddr)
-
+	
+	(family, socktype, proto, canonname, address) = socket.getaddrinfo(hostname, TFTP_PORT)[1]
+	cs = socket.socket(family, socktype, proto)
 	if direction == TFTP_GET:
 		request = make_packet_rrq(fd.name, MODE_OCTET)
 	else:
 		request = make_packet_wrq(fd.name, MODE_OCTET)
     # Check if we are putting a file or getting a file and send
     #  the corresponding request.
-    cs.sendto(request, address)
+	cs.sendto(request, address)
     # Put or get the file, block by block, in a loop.
 
-	(rcv_buffer, (host, port)) = cs.recvfrom(BLOCK_SIZE)     
-    rcv_total, retry_count = len(rcv_buffer), 0
+	rcv_total = 0
 
+	while True:
+		(rl,wl,xl) = select.select([cs], [], [], TFTP_TIMEOUT)
 
-    while True:
-		(rl,wl,xl) = select.select(cs, [], [], TFTP_TIMEOUT)
-
-		if direction == TFTP_GET:		
+		if direction == TFTP_GET:
+			print("tu madre")
+			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)
+			print("Axels madre")
 			opcode, blocknr, data = parse_packet(recv_buffer)
 			fd.write(data)
 			ack_packet = make_packet_ack(blocknr)
-			cs.sendto(ack_packet,address)	
+			cs.sendto(ack_packet, addr)	
+
 			if len(rcv_buffer) > BLOCK_SIZE:
 				break
-			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)     
-    		rcv_total, retry_count = len(rcv_buffer), 0
+
+    		rcv_total += len(rcv_buffer)
 		
 						
         # Wait for packet, write the data to the filedescriptor or
