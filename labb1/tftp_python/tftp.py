@@ -127,11 +127,18 @@ def tftp_transfer(fd, hostname, direction):
 				break
 
 
-		#if direction == TFTP_PUT:
-    		
+		if direction == TFTP_PUT:
+    		rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)
+			packet = parse_packet(rcv_buffer)
 			
-		
-						
+			if packet[0] == OPCODE_ACK:
+				blocknr = packet[1]
+				blocknr = blocknr+1
+				data_packet = make_packet_data(blocknr,fd.read(BLOCK_SIZE))
+				cs.sendto(data_packet,addr)
+			if packet[0] == OPCODE_ERR:
+				print packet[2]
+			
         # Wait for packet, write the data to the filedescriptor or
         # read the next block from the file. Send new packet to server.
         # Don't forget to deal with timeouts and received error packets.
