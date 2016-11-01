@@ -131,10 +131,11 @@ def tftp_transfer(fd, hostname, direction):
 
 			if packet[0] == OPCODE_ACK:
 				blocknr = packet[1]+1
-				data = fd.read(BLOCK_SIZE-4)
+				data = fd.read(BLOCK_SIZE)
 				data_packet = make_packet_data(blocknr,data)
+				print len(data_packet)
+				print len(data)
 				cs.sendto(data_packet,addr)
-				#dataSize = len(parse_packet(data_packet)[2][0])
 				if len(data) < BLOCK_SIZE:
 					print "Finished Uploading!"
 					break
