@@ -116,7 +116,7 @@ def tftp_transfer(fd, hostname, direction):
 			print("tu madre")
 			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)
 			print("Axels madre")
-			opcode, blocknr, data = parse_packet(recv_buffer)
+			opcode, blocknr, data = parse_packet(rcv_buffer)
 			fd.write(data)
 			ack_packet = make_packet_ack(blocknr)
 			cs.sendto(ack_packet, addr)	
