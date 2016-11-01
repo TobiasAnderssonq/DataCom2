@@ -69,10 +69,10 @@ def parse_packet(msg):
 		return opcode, l[0], l[1] #PREVIOUSLY 1 AND 2
 
 	elif opcode == OPCODE_DATA:
-		sizeOfData = sys.getsizeof(msg[4:])/2
+		sizeOfData = sys.getsizeof(msg[4:])
 		blocknr = struct.unpack("!H", msg[2:4])[0]
 		print sizeOfData
-		data = struct.unpack("!"+str(sizeOfData)+"H", msg[4:])	
+		data = struct.unpack("!"+str(sizeOfData)+"s", msg[4:])	
 		if blocknr != None and data != None:
 			return opcode, blocknr, data		
 		return None
