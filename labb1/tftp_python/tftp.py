@@ -120,7 +120,7 @@ def tftp_transfer(fd, hostname, direction):
 			fd.write(data[0])
 			ack_packet = make_packet_ack(blocknr)
 			cs.sendto(ack_packet, addr)	
-			rcv_total += len(rcv_buffer)
+			rcv_total += len(rcv_buffer)-HEADER_SIZE
 			
 			if len(rcv_buffer) < BLOCK_SIZE:
 				print "Received: " + str(rcv_total) + " Bytes"
@@ -135,8 +135,11 @@ def tftp_transfer(fd, hostname, direction):
 				blocknr = packet[1]+1
 				data = fd.read(BLOCK_SIZE)
 				data_packet = make_packet_data(blocknr,data)
-				
 				cs.sendto(data_packet,addr)
+
+				print len(data_packet)
+				print data_packet
+
 				if len(data) < BLOCK_SIZE:
 					print "Finished Uploading!"
 					break
