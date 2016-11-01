@@ -110,12 +110,11 @@ def tftp_transfer(fd, hostname, direction):
 	rcv_total = 0
 	
 	while True:
-		(rl,wl,xl) = select.select([cs], [], [], TFTP_TIMEOUT)
+		(rl,wl,xl) = select.select([cs], [cs], [], TFTP_TIMEOUT)
 
 		if direction == TFTP_GET:
 			
-			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)
-			
+			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)	
 			opcode, blocknr, data = parse_packet(rcv_buffer)
 			fd.write(data[0])
 			ack_packet = make_packet_ack(blocknr)
@@ -128,9 +127,12 @@ def tftp_transfer(fd, hostname, direction):
 
 
 		if direction == TFTP_PUT:
+			print "hej?"
     		rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)
+			print "HALLOJ!"			
 			packet = parse_packet(rcv_buffer)
-			
+			print packet[0]
+			print packet[1]
 			if packet[0] == OPCODE_ACK:
 				blocknr = packet[1]
 				blocknr = blocknr+1
