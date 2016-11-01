@@ -127,7 +127,7 @@ def tftp_transfer(fd, hostname, direction):
 				break
 
 
-		if direction == TFTP_PUT:
+		#if direction == TFTP_PUT:
     		
 			
 		
