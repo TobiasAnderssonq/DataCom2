@@ -42,7 +42,7 @@ def make_packet_wrq(filename, mode):
 
 def make_packet_data(blocknr, data):
 	sizeOfData = len(data)
-	return struct.pack("!"+str(sizeOfData)+"s", OPCODE_DATA, blocknr, data)
+	return struct.pack("!HH", OPCODE_DATA, blocknr) + data
 
 def make_packet_ack(blocknr):
     return struct.pack("!HH", OPCODE_ACK,blocknr)
