@@ -38,16 +38,17 @@ def make_packet_rrq(filename, mode):
     return struct.pack("!H", OPCODE_RRQ) + filename + '\0' + mode + '\0'
 
 def make_packet_wrq(filename, mode):
-    return "" # TODO
+    return struct.pack("!H", OPCODE_WRQ) + filename + '\0' + mode + '\0'
 
 def make_packet_data(blocknr, data):
-    return "" # TODO
+	numberOfH = sys.getsizeof(data)/2
+    return struct.pack("!"+str(numberOfH+2)+"H", OPCODE_DATA, blocknr, data)
 
 def make_packet_ack(blocknr):
-    return "" # TODO
+    return struct.pack("!HH", OPCODE_ACK,blocknr)
 
 def make_packet_err(errcode, errmsg):
-    return "" # TODO
+    return struct.pack("!HH", OPCODE_ERR, errcode) + errmsg + '\0'
 
 def parse_packet(msg):
     """This function parses a recieved packet and returns a tuple where the
@@ -58,18 +59,43 @@ def parse_packet(msg):
         l = msg[2:].split('\0')
         if len(l) != 3:
             return None
-        return opcode, l[1], l[2]
+        return opcode, l[0], l[1] #PREVIOUSLY 1 AND 2
+
     elif opcode == OPCODE_WRQ:
-        # TDOO
-        return opcode, # something here
-    # TODO
-    return None
+        l = msg[2:].split('\0')
+        if len(l) != 3:
+            return None
+        return opcode, l[0], l[1] #PREVIOUSLY 1 AND 2
+
+	elif opcode == OPCODE_DATA:
+		sizeOfData = sys.getsizeof(msg[4:])/2
+		blocknr = struct.unpack("!H", msg[2:4])[0]
+		data = struct.unpack("!"+str(sizeofData)+"H", msg[4:])	
+		if blocknr != None and data != None    	
+			return opcode, blocknr, data		
+		return None
+
+	elif opcode == OPCODE_ACK:
+		blocknr = struct.unpack("!H", msg[2:4])[0]
+			if blocknr != None:
+				return opcode, blocknr				
+		return None
+	
+	elif opcode == OPCODE_ERR:
+		errcode = struct.unpack("!H", msg[2:4])[0]
+		errmsg = msg[4:].split('\0')
+		if errcode != None and errormsg != None:
+			return opcode, errcode, errmsg
+		return None	
+
+	return None	
 
 def tftp_transfer(fd, hostname, direction):
     # Implement this function
     
     # Open socket interface
-    
+    cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	(family, socktype, proto, canonname, sockaddr) = getaddrinfo(hostname)
     # Check if we are putting a file or getting a file and send
     #  the corresponding request.
     
