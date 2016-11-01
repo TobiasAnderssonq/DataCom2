@@ -127,9 +127,9 @@ def tftp_transfer(fd, hostname, direction):
 
 
 		if direction == TFTP_PUT:
-			print ("hej?")
+			print "hej?"
     		rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)
-			print ("HALLOJ!")			
+			print "HALLOJ!"			
 			packet = parse_packet(rcv_buffer)
 			print packet[0]
 			print packet[1]
