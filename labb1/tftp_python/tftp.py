@@ -72,7 +72,6 @@ def parse_packet(msg):
 		sizeOfData = len(msg[4:])
 		blocknr = struct.unpack("!H", msg[2:4])[0]
 		data = struct.unpack("!"+str(sizeOfData)+"s", msg[4:])
-		print sizeOfData
 		if blocknr != None and data != None:
 			return opcode, blocknr, data
 		return None
@@ -136,10 +135,6 @@ def tftp_transfer(fd, hostname, direction):
 				data = fd.read(BLOCK_SIZE)
 				data_packet = make_packet_data(blocknr,data)
 				cs.sendto(data_packet,addr)
-
-				print len(data_packet)
-				print data_packet
-
 				if len(data) < BLOCK_SIZE:
 					print "Finished Uploading!"
 					break
