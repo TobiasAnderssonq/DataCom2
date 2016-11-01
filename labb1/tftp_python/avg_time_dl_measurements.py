@@ -23,4 +23,4 @@ while current_run < number_of_runs:
 
 total_time = ((time.time() - start_time)/current_run)
 
-print "Avg time:"+ str(total_time) + " seconds --------  Number of samples:" + str(current_run) 
+print "Avg time to download:"+ str(total_time) + " seconds --------  Number of samples:" + str(current_run) 
