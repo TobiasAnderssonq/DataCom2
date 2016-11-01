@@ -18,6 +18,7 @@ TFTP_PORT= 69
 
 # Timeout in seconds
 TFTP_TIMEOUT= 2
+HEADER_SIZE = 4
 
 ERROR_CODES = ["Undef",
                "File not found",
@@ -68,9 +69,9 @@ def parse_packet(msg):
 		return opcode, l[0], l[1] #PREVIOUSLY 1 AND 2
 
 	elif opcode == OPCODE_DATA:
-		sizeOfData = len(msg[4:][0])
+		sizeOfData = len(msg[4:])
 		blocknr = struct.unpack("!H", msg[2:4])[0]
-		data = struct.unpack("!"+str(sizeOfData)+"s", msg[4:][0])[0]
+		data = struct.unpack("!"+str(sizeOfData)+"s", msg[4:])[0]
 		print sizeOfData
 		if blocknr != None and data != None:
 			return opcode, blocknr, data
@@ -79,7 +80,7 @@ def parse_packet(msg):
 	elif opcode == OPCODE_ACK:
 		blocknr = struct.unpack("!H", msg[2:4])[0]
 		if blocknr != None:
-			return opcode, blocknr				
+			return opcode, blocknr
 		return None
 	
 	elif opcode == OPCODE_ERR:
@@ -114,7 +115,7 @@ def tftp_transfer(fd, hostname, direction):
 
 		if direction == TFTP_GET:
 			
-			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)	
+			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)	
 			opcode, blocknr, data = parse_packet(rcv_buffer)
 			fd.write(data[0])
 			ack_packet = make_packet_ack(blocknr)
@@ -127,7 +128,7 @@ def tftp_transfer(fd, hostname, direction):
 
 
 		if direction == TFTP_PUT:
-			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE)		
+			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)		
 			packet = parse_packet(rcv_buffer)
 
 			if packet[0] == OPCODE_ACK:
