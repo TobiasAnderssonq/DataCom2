@@ -14,7 +14,7 @@ MODE_NETASCII= "netascii"
 MODE_OCTET=    "octet"
 MODE_MAIL=     "mail"
 
-TFTP_PORT= 69
+TFTP_PORT= 6969
 
 # Timeout in seconds
 TFTP_TIMEOUT= 2
