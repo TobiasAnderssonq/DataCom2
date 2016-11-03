@@ -146,9 +146,8 @@ def tftp_transfer(fd, hostname, direction):
 				if e.args[0] == 'timed out':
 					print "Timed out, resending ack for blocknumber: " + str(blocknr)
 					if blocknr == 0:
-						data = fd.read(BLOCK_SIZE)
-						data_packet = make_packet_data(blocknr,data)
-						oldblocknr = blocknr 
+						#Inital request failed
+						sys.exit(1) 
 					cs.sendto(ack_packet, addr)
 					continue
 			except Exception as e:
