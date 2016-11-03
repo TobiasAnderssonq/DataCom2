@@ -14,7 +14,7 @@ MODE_NETASCII= "netascii"
 MODE_OCTET=    "octet"
 MODE_MAIL=     "mail"
 
-TFTP_PORT= 6969
+TFTP_PORT= 13069
 
 # Timeout in seconds
 TFTP_TIMEOUT= 2
@@ -225,11 +225,13 @@ def tftp_transfer(fd, hostname, direction):
 				upload_total += len(data)
 
 			if len(data) < BLOCK_SIZE:
-					while true:
+					while True:
 						try:
 							rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)		
 						except socket.timeout, e:
 							if e.args[0] == 'timed out':
+								print len(data)
+								print str(data_packet)
 								print "Timed out, resending data from blocknumber: " + str(blocknr)
 								cs.sendto(data_packet,addr)
 								continue
