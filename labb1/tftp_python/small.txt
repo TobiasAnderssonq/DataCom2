@@ -10,7 +10,7 @@ Status of this Memo
 
    This RFC specifies an IAB standards track protocol for the Internet
    community, and requests discussion and suggestions for improvements.
-   Please refer to the current edition of the "IAB cial Protocol
+   Please refer to the current edition of the "IAB Official Protocol
    Standards" for the standardization state and status of this protocol.
    Distribution of this memo is unlimited.
 
@@ -24,14 +24,14 @@ Summary
 
 Acknowlegements
 
-   The prol was originally designed by Noel Chiappa, and was
+   The protocol was originally designed by Noel Chiappa, and was
    redesigned by him, Bob Baldwin and Dave Clark, with comments from
    Steve Szymanski.  The current revision of the document includes
    modifications stemming from discussions with and suggestions from
    Larry Allen, Noel Chiappa, Dave Clark, Geoff Cooper, Mike Greenwald,
    Liza Martin, David Reed, Craig Milo Rogers (of USC-ISI), Kathy
    Yellick, and the author.  The acknowledgement and retransmission
-   scheme was inspired by TCP, and the error anism was suggested by
+   scheme was inspired by TCP, and the error mechanism was suggested by
    PARC's EFTP abort message.
 
    The May, 1992 revision to fix the "Sorcerer's Apprentice" protocol
