@@ -14,7 +14,7 @@ MODE_NETASCII= "netascii"
 MODE_OCTET=    "octet"
 MODE_MAIL=     "mail"
 
-TFTP_PORT= 13069
+TFTP_PORT= sys.argv[4]
 
 # Timeout in seconds
 TFTP_TIMEOUT= 2
