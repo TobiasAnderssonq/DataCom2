@@ -128,7 +128,7 @@ def tftp_transfer(fd, hostname, direction):
 	oldblocknr = 0
 	rcv_total = 0
 	upload_total = 0
-	sizeOfFile = fd.tell()
+	
 	
 	# Put or get the file, block by block, in a loop.
 	while True:
@@ -205,7 +205,7 @@ def tftp_transfer(fd, hostname, direction):
 			
 
 			packet = parse_packet(rcv_buffer)
-			print str(sizeOfFile % 512)
+			
 			if packet[0] == OPCODE_ACK:
 								
 				blocknr = packet[1]+1
@@ -225,8 +225,16 @@ def tftp_transfer(fd, hostname, direction):
 				upload_total += len(data)
 
 			if len(data) < BLOCK_SIZE:
-					print "Finished Uploading! Uploaded total data: "+ str(upload_total)
-					break	
+					while true:
+						try:
+							rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)		
+						except socket.timeout, e:
+							if e.args[0] == 'timed out':
+								print "Timed out, resending data from blocknumber: " + str(blocknr)
+								cs.sendto(data_packet,addr)
+								continue
+						break					
+							
 
 			if packet[0] == OPCODE_ERR:
 				print packet[2]
