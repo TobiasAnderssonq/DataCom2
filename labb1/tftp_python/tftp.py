@@ -14,7 +14,7 @@ MODE_NETASCII= "netascii"
 MODE_OCTET=    "octet"
 MODE_MAIL=     "mail"
 
-TFTP_PORT= 11069
+TFTP_PORT= 6969
 
 # Timeout in seconds
 TFTP_TIMEOUT= 2
@@ -123,9 +123,11 @@ def tftp_transfer(fd, hostname, direction):
 	except Exception as e:
 		print "Failed to send to address: " + str(address) + "\nERROR: %s" % e
 		sys.exit(1)
-   
 
+	blocknr = 0
+	oldblocknr = 0
 	rcv_total = 0
+	upload_total = 0
 	# Put or get the file, block by block, in a loop.
 	while True:
 
@@ -137,7 +139,7 @@ def tftp_transfer(fd, hostname, direction):
  
 
 		if direction == TFTP_GET:
-
+			
 			try:				
 				rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)
 			except socket.timeout, e:
@@ -149,24 +151,36 @@ def tftp_transfer(fd, hostname, direction):
 				print "Failed to receieve data from socket " + str(cs) + "\nError: %s" % e
 				sys.exit(1)
 
-			opcode, blocknr, data = parse_packet(rcv_buffer)
-			fd.write(data[0])
-			ack_packet = make_packet_ack(blocknr)
 
-			try:
-				cs.sendto(ack_packet, addr)
-			except Exception as e:
-				print "Failed to send to address: " + addr + "\nERROR: %s" % e
-				sys.exit(1)
+			packet = parse_packet(rcv_buffer)
 
-			rcv_total += len(rcv_buffer)-HEADER_SIZE
-			if len(rcv_buffer) < BLOCK_SIZE:
-				print "Received: " + str(rcv_total) + " Bytes"
-				break
+			
+			if packet[0] == OPCODE_DATA:
+				if oldblocknr >= packet[1]:
+					continue
+				blocknr = packet[1]
+				fd.write(packet[2][0])
+				ack_packet = make_packet_ack(packet[1])
+
+				try:
+					cs.sendto(ack_packet, addr)
+					oldblocknr = packet[1]
+				except Exception as e:
+					print "Failed to send to address: " + addr + "\nERROR: %s" % e
+					sys.exit(1)
+
+				rcv_total += len(rcv_buffer)-HEADER_SIZE
+				if len(rcv_buffer) < BLOCK_SIZE:
+					print "Received: " + str(rcv_total) + " Bytes"
+					break
+			
+			if packet[0] == OPCODE_ERR:
+				print packet[2]
+				
 
 
 		if direction == TFTP_PUT:
-
+			
 			try:
 				rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)		
 			except socket.timeout, e:
@@ -177,21 +191,30 @@ def tftp_transfer(fd, hostname, direction):
 			except Exception as e:
 				print "Failed to receieve data from socket " + str(cs) + "\nError: %s" % e
 
+
 			packet = parse_packet(rcv_buffer)
 
+		
+			
+			
+
 			if packet[0] == OPCODE_ACK:
+								
 				blocknr = packet[1]+1
+				if oldblocknr >= packet[1]:
+					blocknr = oldblocknr+1
+
 				data = fd.read(BLOCK_SIZE)
 				data_packet = make_packet_data(blocknr,data)
-
+				oldblocknr = blocknr
 				try:
 					cs.sendto(data_packet,addr)
 				except Exception as e:
 					print "Failed to send to address: " + addr + "\nERROR: %s" % e
 					sys.exit(1)
-
+				upload_total += len(data)
 				if len(data) < BLOCK_SIZE:
-					print "Finished Uploading!"
+					print "Finished Uploading! Uploaded total data: "+ str(upload_total)
 					break
 
 			if packet[0] == OPCODE_ERR:
