@@ -14,7 +14,7 @@ MODE_NETASCII= "netascii"
 MODE_OCTET=    "octet"
 MODE_MAIL=     "mail"
 
-TFTP_PORT= 13069
+TFTP_PORT= 6969
 
 # Timeout in seconds
 TFTP_TIMEOUT= 2
@@ -128,6 +128,8 @@ def tftp_transfer(fd, hostname, direction):
 	oldblocknr = 0
 	rcv_total = 0
 	upload_total = 0
+	sizeOfFile = fd.tell()
+	
 	# Put or get the file, block by block, in a loop.
 	while True:
 
@@ -194,19 +196,22 @@ def tftp_transfer(fd, hostname, direction):
 					if blocknr == 0:
 						#Inital request failed, try to send again
 						cs.sendto(request, address) 
-					else:
+					else:					
 						cs.sendto(data_packet,addr)
 					continue
 			except Exception as e:
 				print "Failed to receieve data from socket " + str(cs) + "\nError: %s" % e
 
+			
 
 			packet = parse_packet(rcv_buffer)
-
+			print str(sizeOfFile % 512)
 			if packet[0] == OPCODE_ACK:
 								
 				blocknr = packet[1]+1
-				if oldblocknr >= packet[1]:
+				print str(packet[1])
+				if oldblocknr > packet[1]:
+					print "Received package: " + str(packet[1]) + " Expected: " + str(oldblocknr)
 					blocknr = oldblocknr+1
 
 				data = fd.read(BLOCK_SIZE)
@@ -218,9 +223,10 @@ def tftp_transfer(fd, hostname, direction):
 					print "Failed to send to address: " + addr + "\nERROR: %s" % e
 					sys.exit(1)
 				upload_total += len(data)
-				if len(data) < BLOCK_SIZE:
+
+			if len(data) < BLOCK_SIZE:
 					print "Finished Uploading! Uploaded total data: "+ str(upload_total)
-					break
+					break	
 
 			if packet[0] == OPCODE_ERR:
 				print packet[2]
