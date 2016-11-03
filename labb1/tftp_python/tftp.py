@@ -14,7 +14,7 @@ MODE_NETASCII= "netascii"
 MODE_OCTET=    "octet"
 MODE_MAIL=     "mail"
 
-TFTP_PORT= 6969
+TFTP_PORT= 13069
 
 # Timeout in seconds
 TFTP_TIMEOUT= 2
@@ -109,7 +109,7 @@ def tftp_transfer(fd, hostname, direction):
 		print "Failed to create socket with data: " + str(family) + " " + str(socktype) + " " + str(proto) + "\nERROR: %s" % e 
 		sys.exit(1)
 
-	cs.settimeout(1)
+	cs.settimeout(0.8)
 	# Check if we are putting a file or getting a file and send
     #  the corresponding request.
 	if direction == TFTP_GET:
@@ -144,7 +144,11 @@ def tftp_transfer(fd, hostname, direction):
 				rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)
 			except socket.timeout, e:
 				if e.args[0] == 'timed out':
-					print "Timed out, resending ack for blocknumber: " + str(blocknr) 
+					print "Timed out, resending ack for blocknumber: " + str(blocknr)
+					if blocknr == 0:
+						data = fd.read(BLOCK_SIZE)
+						data_packet = make_packet_data(blocknr,data)
+						oldblocknr = blocknr 
 					cs.sendto(ack_packet, addr)
 					continue
 			except Exception as e:
@@ -163,6 +167,7 @@ def tftp_transfer(fd, hostname, direction):
 				ack_packet = make_packet_ack(packet[1])
 
 				try:
+					
 					cs.sendto(ack_packet, addr)
 					oldblocknr = packet[1]
 				except Exception as e:
@@ -186,6 +191,10 @@ def tftp_transfer(fd, hostname, direction):
 			except socket.timeout, e:
 				if e.args[0] == 'timed out':
 					print "Timed out, resending data from blocknumber: " + str(blocknr)
+					if blocknr == 0:
+						data = fd.read(BLOCK_SIZE)
+						data_packet = make_packet_data(blocknr,data)
+						oldblocknr = blocknr
 					cs.sendto(data_packet,addr)
 					continue
 			except Exception as e:
@@ -193,10 +202,6 @@ def tftp_transfer(fd, hostname, direction):
 
 
 			packet = parse_packet(rcv_buffer)
-
-		
-			
-			
 
 			if packet[0] == OPCODE_ACK:
 								
