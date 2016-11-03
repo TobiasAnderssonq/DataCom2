@@ -146,9 +146,10 @@ def tftp_transfer(fd, hostname, direction):
 				if e.args[0] == 'timed out':
 					print "Timed out, resending ack for blocknumber: " + str(blocknr)
 					if blocknr == 0:
-						#Inital request failed
-						sys.exit(1) 
-					cs.sendto(ack_packet, addr)
+						#Inital request failed, try to send again
+						cs.sendto(request, address) 
+					else:
+						cs.sendto(ack_packet, addr)
 					continue
 			except Exception as e:
 				print "Failed to receieve data from socket " + str(cs) + "\nError: %s" % e
@@ -191,10 +192,10 @@ def tftp_transfer(fd, hostname, direction):
 				if e.args[0] == 'timed out':
 					print "Timed out, resending data from blocknumber: " + str(blocknr)
 					if blocknr == 0:
-						data = fd.read(BLOCK_SIZE)
-						data_packet = make_packet_data(blocknr,data)
-						oldblocknr = blocknr
-					cs.sendto(data_packet,addr)
+						#Inital request failed, try to send again
+						cs.sendto(request, address) 
+					else:
+						cs.sendto(data_packet,addr)
 					continue
 			except Exception as e:
 				print "Failed to receieve data from socket " + str(cs) + "\nError: %s" % e
