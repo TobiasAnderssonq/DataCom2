@@ -95,11 +95,11 @@ def waitForLastAck(data_packet, blocknr, cs):
 	while True:
 		try:
 			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)		
-			except socket.timeout, e:
-				if e.args[0] == 'timed out':
-					print "Timed out, resending data from blocknumber: " + str(blocknr)
-					cs.sendto(data_packet,addr)
-					continue
+		except socket.timeout, e:
+			if e.args[0] == 'timed out':
+				print "Timed out, resending data from blocknumber: " + str(blocknr)
+				cs.sendto(data_packet,addr)
+				continue
 		return None
 
 def tftp_transfer(fd, hostname, direction):
