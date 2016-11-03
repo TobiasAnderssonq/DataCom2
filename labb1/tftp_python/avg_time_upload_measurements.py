@@ -21,8 +21,8 @@ if (os.path.exists(file_to_upload)):
 	
 
 	total_time = ((time.time() - start_time)/current_run)
-
-	print "Avg time to upload:"+ str(total_time) + " seconds --------  Number of samples:" + str(current_run) 
+	subprocess.call('echo Average time: ' + str(total_time) + " File size: " + str(file_to_upload) + " >> result.txt", shell=True)
+	print "Avg time to upload:"+ str(total_time) + " seconds --------  Number of samples:" + str(current_run)
 else:
 	print "No such file"
 
