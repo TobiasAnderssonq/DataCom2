@@ -89,7 +89,18 @@ def parse_packet(msg):
 			return opcode, errcode, errmsg
 		return None	
 
-	return None	
+	return None
+
+def waitForLastAck(data_packet, blocknr, cs):
+	while True:
+		try:
+			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)		
+			except socket.timeout, e:
+				if e.args[0] == 'timed out':
+					print "Timed out, resending data from blocknumber: " + str(blocknr)
+					cs.sendto(data_packet,addr)
+					continue
+		return None
 
 def tftp_transfer(fd, hostname, direction):
     # Implement this function
@@ -225,18 +236,8 @@ def tftp_transfer(fd, hostname, direction):
 				upload_total += len(data)
 
 			if len(data) < BLOCK_SIZE:
-					while True:
-						try:
-							rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)		
-						except socket.timeout, e:
-							if e.args[0] == 'timed out':
-								print len(data)
-								print str(data_packet)
-								print "Timed out, resending data from blocknumber: " + str(blocknr)
-								cs.sendto(data_packet,addr)
-								continue
-						break					
-							
+					waitForLastAck(data_packet, blocknr, cs)
+					break			
 
 			if packet[0] == OPCODE_ERR:
 				print packet[2]
