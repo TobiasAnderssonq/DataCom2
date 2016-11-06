@@ -1,5 +1,4 @@
 SSH INTO ARRHENIUS FROM HOME NETWORK - WIFI
-
 total time: 0.232141039371 FileSize: small.txt
 total time: 0.279837489128 FileSize: medium.pdf
 total time: 0.305791189671 FileSize: large.jpeg
@@ -8,28 +7,6 @@ Average time: 0.0328373289108 File size: smallUpload.txt
 Average time: 0.0477843213081 File size: mediumUpload.pdf
 Average time: 0.10544271946 File size: largeUpload.jpeg
 END UPLOAD 6969 -- 100 samples WiFi
-
-
-ON SCHOOL NETWORK - WIFI
-
-total time: 0.0866095805168 FileSize: small.txt
-total time: 0.232362630367 FileSize: medium.pdf
-total time: 0.80781471014 FileSize: large.jpeg
-DONE DOWNLOAD 6969 -- 100 samples
-Average time: 0.0837995696068 File size: smallUpload.txt
-Average time: 0.267867391109 File size: mediumUpload.pdf
-Average time: 1.07148988962 File size: largeUpload.jpeg
-DONE UPLOAD 6969 -- 100 samples
-total time: 0.0921295404434 FileSize: small.txt
-total time: 0.262436840534 FileSize: medium.pdf
-total time: 0.743237040043 FileSize: large.jpeg
-DONE DOWNLOAD 20069 -- 100 samples
-Average time: 0.0976727294922 File size: smallUpload.txt
-Average time: 0.319976119995 File size: mediumUpload.pdf
-Average time: 0.486068081856 File size: largeUpload.jpeg
-DONE UPLOAD 20069 -- 100 samples
-
-SSH INTO ARRHENIUS FROM HOME NETWORK - WIFI
 total time: 0.344007897377 FileSize: small.txt
 total time: 2.8003895998 FileSize: medium.pdf
 total time: 13.0062170029 FileSize: large.jpeg
@@ -54,3 +31,47 @@ Average time: 1.65301389694 File size: smallUpload.txt
 Average time: 8.4744893074 File size: mediumUpload.pdf
 Average time: 41.0700582027 File size: largeUpload.jpeg
 DONE UPLOAD 13069 -- 10 samples
+
+HOME NETWORK - CABLE
+total time: 0.122399902344 FileSize: small.txt
+total time: 0.559082317352 FileSize: medium.pdf
+total time: 1.27906601429 FileSize: large.jpeg
+DONE DOWNLOAD 6969 -- 10 samples
+Average time: 0.124615812302 File size: smallUpload.txt
+Average time: 0.577993988991 File size: mediumUpload.pdf
+Average time: 1.56394741535 File size: largeUpload.jpeg
+DONE UPLOAD 6969 -- 10 samples
+total time: 0.209110713005 FileSize: small.txt
+total time: 2.71592831612 FileSize: medium.pdf
+total time: 14.9982268095 FileSize: large.jpeg
+DONE DOWNLOAD 11069 -- 10 samples
+Average time: 0.862228393555 File size: smallUpload.txt
+Average time: 2.22237920761 File size: mediumUpload.pdf
+Average time: 16.1688059092 File size: largeUpload.jpeg
+DONE UPLOAD 11069 -- 10 samples
+total time: 0.299993896484 FileSize: small.txt
+total time: 5.26800639629 FileSize: medium.pdf
+total time: 27.4504888058 FileSize: large.jpeg
+DONE DOWNLOAD 12069 -- 10 sampels
+Average time: 0.70143737793 File size: smallUpload.txt
+Average time: 5.8363699913 File size: mediumUpload.pdf
+Average time: 28.5755963087 File size: largeUpload.jpeg
+DONE UPLOAD 12069 -- 10 samples
+total time: 1.02115738392 FileSize: small.txt
+total time: 8.25715308189 FileSize: medium.pdf
+total time: 41.2207322121 FileSize: large.jpeg
+DONE DOWNLOAD 13069 -- 10 samples
+Average time: 0.945095610619 File size: smallUpload.txt
+Average time: 8.41062729359 File size: mediumUpload.pdf
+Average time: 40.4742142916 File size: largeUpload.jpeg
+DONE UPLOAD 13069 -- 10 samples
+
+ON SCHOOL NETWORK - WIFI
+total time: 0.0866095805168 FileSize: small.txt
+total time: 0.232362630367 FileSize: medium.pdf
+total time: 0.80781471014 FileSize: large.jpeg
+DONE DOWNLOAD 6969 -- 100 samples
+Average time: 0.0837995696068 File size: smallUpload.txt
+Average time: 0.267867391109 File size: mediumUpload.pdf
+Average time: 1.07148988962 File size: largeUpload.jpeg
+DONE UPLOAD 6969 -- 100 samples
