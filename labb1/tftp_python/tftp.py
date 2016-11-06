@@ -14,7 +14,7 @@ MODE_NETASCII= "netascii"
 MODE_OCTET=    "octet"
 MODE_MAIL=     "mail"
 
-TFTP_PORT= 20069
+TFTP_PORT= 13069
 
 # Timeout in seconds
 TFTP_TIMEOUT= 2
@@ -91,7 +91,7 @@ def parse_packet(msg):
 
 	return None
 
-def waitForLastAck(data_packet, blocknr, cs):
+def waitForLastAck(data_packet, blocknr, cs, addr):
 	while True:
 		try:
 			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)		
@@ -236,7 +236,7 @@ def tftp_transfer(fd, hostname, direction):
 				upload_total += len(data)
 
 			if len(data) < BLOCK_SIZE:
-					waitForLastAck(data_packet, blocknr, cs)
+					waitForLastAck(data_packet, blocknr, cs, addr)
 					break			
 
 			if packet[0] == OPCODE_ERR:

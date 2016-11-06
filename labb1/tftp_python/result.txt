@@ -30,3 +30,27 @@ Average time: 0.486068081856 File size: largeUpload.jpeg
 DONE UPLOAD 20069 -- 100 samples
 
 SSH INTO ARRHENIUS FROM HOME NETWORK - WIFI
+total time: 0.344007897377 FileSize: small.txt
+total time: 2.8003895998 FileSize: medium.pdf
+total time: 13.0062170029 FileSize: large.jpeg
+DONE DOWNLOAD 11069 -- 10 samples
+Average time: 0.594337701797 File size: smallUpload.txt
+Average time: 3.25572628975 File size: mediumUpload.pdf
+Average time: 12.6210705042 File size: largeUpload.jpeg
+DONE UPLOAD 11069 -- 10 samples
+total time: 0.795105290413 FileSize: small.txt
+total time: 6.10716099739 FileSize: medium.pdf
+total time: 24.0575241804 FileSize: large.jpeg
+DONE DOWNLOAD 12069 -- 10 samples
+Average time: 0.995596790314 File size: smallUpload.txt
+Average time: 5.42042789459 File size: mediumUpload.pdf
+Average time: 24.8823272943 File size: largeUpload.jpeg
+DONE UPLOAD 12069 -- 10 samples
+total time: 0.827843809128 FileSize: small.txt
+total time: 9.43416190147 FileSize: medium.pdf
+total time: 39.3842238903 FileSize: large.jpeg
+DONE DOWNLOAD 13069 -- 10 samples
+Average time: 1.65301389694 File size: smallUpload.txt
+Average time: 8.4744893074 File size: mediumUpload.pdf
+Average time: 41.0700582027 File size: largeUpload.jpeg
+DONE UPLOAD 13069 -- 10 samples
