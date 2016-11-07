@@ -104,11 +104,10 @@ def waitForLastAck(data_packet, blocknr, cs, addr):
 
 def openSocketInterface(hostname):
 	try:
-		(family, socktype, proto, canonname, address) = socket.getaddrinfo(hostname, TFTP_PORT)[1]
+		return socket.getaddrinfo(hostname, TFTP_PORT)[1]
 	except Exception as e:
 		print "Failed to get address info on hostname: " + str(hostname) + "\nERROR: %s" % e
 		sys.exit(1)
-	return (family, socktype, proto, canonname, address)
 
 
 def createSocket(family, socktype, proto):
