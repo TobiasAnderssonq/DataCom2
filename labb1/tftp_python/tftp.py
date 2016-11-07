@@ -14,7 +14,7 @@ MODE_NETASCII= "netascii"
 MODE_OCTET=    "octet"
 MODE_MAIL=     "mail"
 
-TFTP_PORT= 13069
+TFTP_PORT= 6969
 
 # Timeout in seconds
 TFTP_TIMEOUT= 2
@@ -102,39 +102,59 @@ def waitForLastAck(data_packet, blocknr, cs, addr):
 				continue
 		return None
 
-def tftp_transfer(fd, hostname, direction):
-    # Implement this function
-    
-    # Open socket interface
-	
+def openSocketInterface(hostname):
 	try:
 		(family, socktype, proto, canonname, address) = socket.getaddrinfo(hostname, TFTP_PORT)[1]
 	except Exception as e:
 		print "Failed to get address info on hostname: " + str(hostname) + "\nERROR: %s" % e
 		sys.exit(1)
+	return (family, socktype, proto, canonname, address)
 
 
+def createSocket(family, socktype, proto):
 	try:
-		cs = socket.socket(family, socktype, proto)
+		return socket.socket(family, socktype, proto)
 	except Exception as e:
 		print "Failed to create socket with data: " + str(family) + " " + str(socktype) + " " + str(proto) + "\nERROR: %s" % e 
 		sys.exit(1)
 
+def waitForFDs(cs):
+	try:
+		return select.select([cs], [cs], [], TFTP_TIMEOUT)
+	except Exception as e:
+		print "Socket not ready: " + str(cs) + "\nERROR: %s" % e
+		sys.exit(1)
+
+
+def tftp_transfer(fd, hostname, direction):
+    # Implement this function
+    
+    # Open socket interface
+	(family, socktype, proto, canonname, address) = openSocketInterface(hostname)
+	
+	# Create socket
+	cs = createSocket(family, socktype, proto)
+	
+	# Set the socket timeout
 	cs.settimeout(0.8)
+
 	# Check if we are putting a file or getting a file and send
-    #  the corresponding request.
+    	# the corresponding request.
 	if direction == TFTP_GET:
 		request = make_packet_rrq(fd.name, MODE_OCTET)
 	else:
 		request = make_packet_wrq(fd.name, MODE_OCTET)
 
-
+	# Make the intial request to the server
 	try:
 		cs.sendto(request, address)
 	except Exception as e:
 		print "Failed to send to address: " + str(address) + "\nERROR: %s" % e
 		sys.exit(1)
 
+
+
+	# Declearing some variables before the while-loop 
 	blocknr = 0
 	oldblocknr = 0
 	rcv_total = 0
@@ -144,11 +164,8 @@ def tftp_transfer(fd, hostname, direction):
 	# Put or get the file, block by block, in a loop.
 	while True:
 
-		try:
-			(rl,wl,xl) = select.select([cs], [cs], [], TFTP_TIMEOUT)
-		except Exception as e:
-			print "Socket not ready: " + str(cs) + "\nERROR: %s" % e
-			sys.exit(1)
+		# Waiting until the file descriptors are ready for either read or write.
+		(rl,wl,xl) = waitForFDs(cs)
  
 
 		if direction == TFTP_GET:
@@ -158,8 +175,8 @@ def tftp_transfer(fd, hostname, direction):
 			except socket.timeout, e:
 				if e.args[0] == 'timed out':
 					print "Timed out, resending ack for blocknumber: " + str(blocknr)
-					if blocknr == 0:
-						#Inital request failed, try to send again
+					#Check if the inital request failed, try to send the request again
+					if blocknr == 0:						
 						cs.sendto(request, address) 
 					else:
 						cs.sendto(ack_packet, addr)
