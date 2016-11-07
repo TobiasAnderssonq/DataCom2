@@ -174,7 +174,8 @@ def tftp_transfer(fd, hostname, direction):
 			except socket.timeout, e:
 				if e.args[0] == 'timed out':
 					print "Timed out, resending ack for blocknumber: " + str(blocknr)
-					#Check if the inital request failed, try to send the request again
+					# Check if the inital request failed if so try to send the request again
+					# else send the ack again			
 					if blocknr == 0:						
 						cs.sendto(request, address) 
 					else:
