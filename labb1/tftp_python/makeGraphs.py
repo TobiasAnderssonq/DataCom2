@@ -251,3 +251,120 @@ py.iplot(fig, filename='AllCABLE')
 
 
 #GRAPHS SCENARIO 3 - SCHOOL WIFI
+SSH6969DL = [0.0866095805168, 0.232362630367, 0.80781471014]
+SSH6969UL = [0.0837995696068, 0.267867391109, 1.07148988962]
+
+SSH11069DL = [0.56159799099, 3.78625869751, 17.2903254986]
+SSH11069UL = [0.282944893837, 3.39976968765, 16.1307363033]
+
+SSH12069DL = [0.779522109032, 6.67849700451, 29.6163219213]
+SSH12069UL = [0.905045890808, 6.56592628956, 28.2573125839]
+
+SSH13069DL = [1.44495539665, 7.97840468884, 44.1788277864]
+SSH13069UL = [1.60765469074, 10.1325145006, 48.9981173038]
+
+# Edit the layout
+layout = dict(title = 'School network - WiFi',
+              xaxis = dict(title = 'FileSize'),
+              yaxis = dict(title = 'Average time'),
+              )
+
+trace1 = go.Scatter(
+    x = fileSize,
+    y = SSH6969DL,
+    name = '6969 Download',
+    line = dict(
+        color = ('rgb(255, 255, 0)'),
+        width = 4,)
+)
+
+trace2 = go.Scatter(
+    x = fileSize,
+    y = SSH6969UL,
+    name = '6969 Upload',
+    line = dict(
+        color = ('rgb(210, 210, 0)'),
+        width = 4,)
+)
+data = [trace1, trace2]
+
+#fig = dict(data=data, layout=layout)
+#py.iplot(fig, filename='CABLE6969')
+
+
+trace3 = go.Scatter(
+    x = fileSize,
+    y = SSH11069DL,
+    name = '11069 Download',
+    line = dict(
+        color = ('rgb(0, 0, 255)'),
+        width = 4,)
+)
+
+trace4 = go.Scatter(
+    x = fileSize,
+    y = SSH11069UL,
+    name = '11069 Upload',
+    line = dict(
+        color = ('rgb(0, 0, 210)'),
+        width = 4,)
+)
+data = [trace3, trace4]
+
+
+# Plot and embed in ipython notebook!
+#fig = dict(data=data, layout=layout)
+#py.iplot(fig, filename='CABLE11069')
+
+trace5 = go.Scatter(
+    x = fileSize,
+    y = SSH12069DL,
+    name = '12069 Download',
+    line = dict(
+        color = ('rgb(0, 255, 0)'),
+        width = 4,)
+)
+
+trace6 = go.Scatter(
+    x = fileSize,
+    y = SSH12069UL,
+    name = '12069 Upload',
+    line = dict(
+        color = ('rgb(0, 210, 0)'),
+        width = 4,)
+)
+data = [trace5, trace6]
+
+
+# Plot and embed in ipython notebook!
+#fig = dict(data=data, layout=layout)
+#py.iplot(fig, filename='SSH12069')
+
+trace7 = go.Scatter(
+    x = fileSize,
+    y = SSH13069DL,
+    name = '13069 Download',
+    line = dict(
+        color = ('rgb(255, 0, 0)'),
+        width = 4,)
+)
+
+trace8 = go.Scatter(
+    x = fileSize,
+    y = SSH13069UL,
+    name = '13069 Upload',
+    line = dict(
+        color = ('rgb(210, 0, 0)'),
+        width = 4,)
+)
+data = [trace7, trace8]
+
+
+# Plot and embed in ipython notebook!
+#fig = dict(data=data, layout=layout)
+#py.iplot(fig, filename='CABLE13069')
+
+data = [trace1, trace2, trace3, trace4, trace5, trace6, trace7, trace8]
+fig = dict(data=data, layout=layout)
+py.iplot(fig, filename='AllSchoolWifi')
+

@@ -75,3 +75,27 @@ Average time: 0.0837995696068 File size: smallUpload.txt
 Average time: 0.267867391109 File size: mediumUpload.pdf
 Average time: 1.07148988962 File size: largeUpload.jpeg
 DONE UPLOAD 6969 -- 100 samples
+total time: 0.56159799099 FileSize: small.txt
+total time: 3.78625869751 FileSize: medium.pdf
+total time: 17.2903254986 FileSize: large.jpeg
+DONE DOWNLOAD 11069 -- 10 samples
+Average time: 0.282944893837 File size: smallUpload.txt
+Average time: 3.39976968765 File size: mediumUpload.pdf
+Average time: 16.1307363033 File size: largeUpload.jpeg
+DONE UPLOAD 11069 -- 10 samples
+total time: 0.779522109032 FileSize: small.txt
+total time: 6.67849700451 FileSize: medium.pdf
+total time: 29.6163219213 FileSize: large.jpeg
+DONE DOWNLOAD 12069 -- 10 samples
+Average time: 0.905045890808 File size: smallUpload.txt
+Average time: 6.56592628956 File size: mediumUpload.pdf
+Average time: 28.2573125839 File size: largeUpload.jpeg
+DONE UPLOAD 12069 -- 10 samples
+total time: 1.44495539665 FileSize: small.txt
+total time: 7.97840468884 FileSize: medium.pdf
+total time: 44.1788277864 FileSize: large.jpeg
+DONE DOWNLOAD 13069 -- 10 samples 
+Average time: 1.60765469074 File size: smallUpload.txt
+Average time: 10.1325145006 File size: mediumUpload.pdf
+Average time: 48.9981173038 File size: largeUpload.jpeg
+DONE UPLOAD 13069 -- 10 samples
