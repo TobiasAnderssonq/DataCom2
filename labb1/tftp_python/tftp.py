@@ -14,7 +14,7 @@ MODE_NETASCII= "netascii"
 MODE_OCTET=    "octet"
 MODE_MAIL=     "mail"
 
-TFTP_PORT= 11069
+TFTP_PORT= 20069
 
 # Timeout in seconds
 TFTP_TIMEOUT= 2
@@ -98,7 +98,6 @@ def waitForLastAck(data_packet, blocknr, cs, addr):
 			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)		
 		except socket.timeout, e:
 			if e.args[0] == 'timed out':
-				print "Timed out, resending data from blocknumber: " + str(blocknr)
 				cs.sendto(data_packet,addr)
 				continue
 		return None
@@ -176,7 +175,6 @@ def tftp_transfer(fd, hostname, direction):
 				rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)
 			except socket.timeout, e:
 				if e.args[0] == 'timed out':
-					print "Timed out, resending ack for blocknumber: " + str(blocknr)
 					# Check if the inital request failed if so try to send the request again
 					# else send the ack again			
 					if blocknr == 0:						
@@ -225,7 +223,6 @@ def tftp_transfer(fd, hostname, direction):
 				rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE) #Read data from socket	
 			except socket.timeout, e:
 				if e.args[0] == 'timed out':
-					print "Timed out, resending data from blocknumber: " + str(blocknr)
 					if blocknr == 0:
 						#Inital request failed, try to send again
 						cs.sendto(request, address) 
@@ -242,9 +239,7 @@ def tftp_transfer(fd, hostname, direction):
 			if packet[0] == OPCODE_ACK:
 								
 				blocknr = packet[1]+1
-				print str(packet[1])
 				if oldblocknr > packet[1]:
-					print "Received package: " + str(packet[1]) + " Expected: " + str(oldblocknr)
 					blocknr = oldblocknr+1
 
 				data = fd.read(BLOCK_SIZE) #Read data from filedescriptor
