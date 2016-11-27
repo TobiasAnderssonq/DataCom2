@@ -128,14 +128,6 @@ def createSocket(family, socktype, proto):
 		print "Failed to create socket with data: " + str(family) + " " + str(socktype) + " " + str(proto) + "\nERROR: %s" % e 
 		sys.exit(1)
 
-#Waits for the filedescriptor to be ready
-def waitForFD(cs):
-	try:
-		return select.select([cs], [], [])
-	except Exception as e:
-		print "Socket not ready: " + str(cs) + "\nERROR: %s" % e
-		sys.exit(1)
-
 
 def tftp_transfer(fd, hostname, direction, maxresend=10):
     # Implement this function
@@ -198,6 +190,7 @@ def tftp_transfer(fd, hostname, direction, maxresend=10):
 					
 			except Exception as e:
 				print "Failed to receieve data from socket " + str(cs) + "\nError: %s" % e
+				cs.close()
 				sys.exit(1)
 
 
@@ -218,6 +211,7 @@ def tftp_transfer(fd, hostname, direction, maxresend=10):
 					oldblocknr = blocknr #Keep track of old blocknumber
 				except Exception as e:
 					print "Failed to send to address: " + addr + "\nERROR: %s" % e
+					cs.close()
 					sys.exit(1)
 
 				rcv_total += len(rcv_buffer)-HEADER_SIZE
@@ -227,7 +221,7 @@ def tftp_transfer(fd, hostname, direction, maxresend=10):
 			
 			elif packet[0] == OPCODE_ERR:
 				print packet[2]
-				sys.exit(0)
+				sys.exit(1)
 				
 
 
@@ -246,14 +240,14 @@ def tftp_transfer(fd, hostname, direction, maxresend=10):
 
 			except Exception as e:
 				print "Failed to receieve data from socket " + str(cs) + "\nError: %s" % e
+				cs.close()
+				sys.exit(1)
 
 			
 
 			packet = parse_packet(rcv_buffer)
 			
 			if packet[0] == OPCODE_ACK:
-								
-				print packet[1]
 				if packet[1] != oldblocknr + 1:
 					continue
 				oldblocknr = packet[1]
@@ -277,10 +271,7 @@ def tftp_transfer(fd, hostname, direction, maxresend=10):
 				print packet[2]
 				cs.close()
 				sys.exit(1)
-				
-        # Wait for packet, write the data to the filedescriptor or
-        # read the next block from the file. Send new packet to server.
-        # Don't forget to deal with timeouts and received error packets.
+
         pass
 
 
