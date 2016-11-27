@@ -14,7 +14,7 @@ MODE_NETASCII= "netascii"
 MODE_OCTET=    "octet"
 MODE_MAIL=     "mail"
 
-TFTP_PORT= 11069
+TFTP_PORT= 13069
 
 # Timeout in seconds
 TFTP_TIMEOUT= 2
@@ -92,19 +92,28 @@ def parse_packet(msg):
 	return None
 
 #Special while-loop for the acknowledgement when sending the last data packet.
-def waitForLastAck(data_packet, blocknr, cs, addr):
+def waitForLastAck(data_packet, expblocknr, cs, addr, maxresend=10):
 	while True:
 		try:
+			if maxresend <= 0:
+				cs.close()
+				sys.exit(1)
+
 			rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)		
+			packet = parse_packet(rcv_buffer)
+			if packet[1] != expblocknr:
+				continue
+
 		except socket.timeout, e:
 			if e.args[0] == 'timed out':
-				print "Timed out, resending data from blocknumber: " + str(blocknr)
+				print "Timed out, resending data from blocknumber: " + str(expblocknr)
 				cs.sendto(data_packet,addr)
+				maxresend = maxresend - 1
 				continue
 		return None
 
-#Opens the socket interface
-def openSocketInterface(hostname):
+#Tries to get the address info
+def getAddrInfo(hostname):
 	try:
 		return socket.getaddrinfo(hostname, TFTP_PORT)[1]
 	except Exception as e:
@@ -119,20 +128,20 @@ def createSocket(family, socktype, proto):
 		print "Failed to create socket with data: " + str(family) + " " + str(socktype) + " " + str(proto) + "\nERROR: %s" % e 
 		sys.exit(1)
 
-#Waits for the filedescriptors to be ready for read and/or write.
-def waitForFDs(cs):
+#Waits for the filedescriptor to be ready
+def waitForFD(cs):
 	try:
-		return select.select([cs], [cs], [], TFTP_TIMEOUT)
+		return select.select([cs], [], [])
 	except Exception as e:
 		print "Socket not ready: " + str(cs) + "\nERROR: %s" % e
 		sys.exit(1)
 
 
-def tftp_transfer(fd, hostname, direction):
+def tftp_transfer(fd, hostname, direction, maxresend=10):
     # Implement this function
     
-    # Open socket interface
-	(family, socktype, proto, canonname, address) = openSocketInterface(hostname)
+	# Get adress info
+	(family, socktype, proto, canonname, addr) = getAddrInfo(hostname)
 	
 	# Create socket
 	cs = createSocket(family, socktype, proto)
@@ -144,46 +153,49 @@ def tftp_transfer(fd, hostname, direction):
     	# the corresponding request.
 	if direction == TFTP_GET:
 		request = make_packet_rrq(fd.name, MODE_OCTET)
-	else:
+	elif direction == TFTP_PUT:
 		request = make_packet_wrq(fd.name, MODE_OCTET)
+	else:
+		print "Invalid direction!"
+		cs.close()
+		sys.exit(1)
+
 
 	# Make the intial request to the server
 	try:
-		cs.sendto(request, address)
+		cs.sendto(request, addr)
 	except Exception as e:
-		print "Failed to send to address: " + str(address) + "\nERROR: %s" % e
+		print "Failed to send to address: " + str(addr) + "\nERROR: %s" % e
 		sys.exit(1)
 
 
 
-	# Declearing some variables before the while-loop 
-	blocknr = 0
-	oldblocknr = 0
+	# Declearing some variables before the while-loop 	
+	oldblocknr = -1
 	rcv_total = 0
 	upload_total = 0
-	
+	next_packet = request
 	
 	# Put or get the file, block by block, in a loop.
 	while True:
 
-		# Waiting until the file descriptors are ready for either read or write.
-		(rl,wl,xl) = waitForFDs(cs)
  
 
 		if direction == TFTP_GET:
 			
 			try:				
 				rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE)
+				maxresend = 10
 			except socket.timeout, e:
 				if e.args[0] == 'timed out':
-					print "Timed out, resending ack for blocknumber: " + str(blocknr)
-					# Check if the inital request failed if so try to send the request again
-					# else send the ack again			
-					if blocknr == 0:						
-						cs.sendto(request, address) 
-					else:
-						cs.sendto(ack_packet, addr)
-					continue
+					if maxresend <= 0:
+						cs.close()
+						sys.exit(1)
+
+					print "Timed out, resending ack for blocknumber: " + str(oldblocknr)
+					cs.sendto(next_packet, addr)
+					maxresend = maxresend - 1
+					
 			except Exception as e:
 				print "Failed to receieve data from socket " + str(cs) + "\nError: %s" % e
 				sys.exit(1)
@@ -198,11 +210,11 @@ def tftp_transfer(fd, hostname, direction):
 					continue
 				blocknr = packet[1]
 				fd.write(packet[2][0]) #Write to filedescriptor
-				ack_packet = make_packet_ack(packet[1]) #Create acknoledgement packet
+				next_packet = make_packet_ack(packet[1]) #Create acknoledgement packet
 
 				try:
 					
-					cs.sendto(ack_packet, addr) #Send acknowledgement
+					cs.sendto(next_packet, addr) #Send acknowledgement
 					oldblocknr = blocknr #Keep track of old blocknumber
 				except Exception as e:
 					print "Failed to send to address: " + addr + "\nERROR: %s" % e
@@ -213,7 +225,7 @@ def tftp_transfer(fd, hostname, direction):
 					print "Received: " + str(rcv_total) + " Bytes"
 					break
 			
-			if packet[0] == OPCODE_ERR:
+			elif packet[0] == OPCODE_ERR:
 				print packet[2]
 				sys.exit(0)
 				
@@ -225,13 +237,13 @@ def tftp_transfer(fd, hostname, direction):
 				rcv_buffer, addr = cs.recvfrom(BLOCK_SIZE+HEADER_SIZE) #Read data from socket	
 			except socket.timeout, e:
 				if e.args[0] == 'timed out':
-					print "Timed out, resending data from blocknumber: " + str(blocknr)
-					if blocknr == 0:
-						#Inital request failed, try to send again
-						cs.sendto(request, address) 
-					else:					
-						cs.sendto(data_packet,addr)
-					continue
+					if maxresend <= 0:
+						cs.close()
+						sys.exit(1)
+					print "Timed out, resending data from blocknumber: " + str(oldblocknr)
+					cs.sendto(next_packet,addr)
+					maxresend = maxresend - 1
+
 			except Exception as e:
 				print "Failed to receieve data from socket " + str(cs) + "\nError: %s" % e
 
@@ -241,30 +253,30 @@ def tftp_transfer(fd, hostname, direction):
 			
 			if packet[0] == OPCODE_ACK:
 								
-				blocknr = packet[1]+1
-				print str(packet[1])
-				if oldblocknr > packet[1]:
-					print "Received package: " + str(packet[1]) + " Expected: " + str(oldblocknr)
-					blocknr = oldblocknr+1
+				print packet[1]
+				if packet[1] != oldblocknr + 1:
+					continue
+				oldblocknr = packet[1]
 
 				data = fd.read(BLOCK_SIZE) #Read data from filedescriptor
-				data_packet = make_packet_data(blocknr,data) #Make the data packet
+				next_packet = make_packet_data(oldblocknr+1,data) #Make the data packet
 				try:
-					cs.sendto(data_packet,addr) #Send data packet
-					oldblocknr = blocknr #Keep track of previous blocknumber.
+					cs.sendto(next_packet,addr) #Send data packet
 				except Exception as e:
 					print "Failed to send to address: " + addr + "\nERROR: %s" % e
+					cs.close()
 					sys.exit(1)
 				upload_total += len(data)
 
 			#Check if last package has been sent.
 			if len(data) < BLOCK_SIZE:
-					waitForLastAck(data_packet, blocknr, cs, addr)
+					waitForLastAck(next_packet, oldblocknr+1, cs, addr)
 					break			
 
-			if packet[0] == OPCODE_ERR:
+			elif packet[0] == OPCODE_ERR:
 				print packet[2]
-				sys.exit(0)
+				cs.close()
+				sys.exit(1)
 				
         # Wait for packet, write the data to the filedescriptor or
         # read the next block from the file. Send new packet to server.
